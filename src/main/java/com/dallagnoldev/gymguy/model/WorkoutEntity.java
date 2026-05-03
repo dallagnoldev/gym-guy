@@ -3,6 +3,10 @@ package com.dallagnoldev.gymguy.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "tb_workout")
 
@@ -13,7 +17,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode
 
-public class WorkoutEntity {
+public class WorkoutEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +33,7 @@ public class WorkoutEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity userId;
+
+    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkoutExerciseEntity> exercises = new ArrayList<>();
 }
