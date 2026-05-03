@@ -11,6 +11,6 @@ public record UserRequestDTO(
         @NotBlank @Min(8) @Max(30) String phoneNumber,
         @NotNull UserSexEnum sex,
         @NotNull @Positive Double height,
-        @NotNull @Positive Double Weight
+        @NotNull @Positive Double weight
 ) {
 }
