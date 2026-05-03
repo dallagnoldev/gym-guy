@@ -2,9 +2,20 @@ package com.dallagnoldev.gymguy.model;
 
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "tb_user")
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode
+
 public class UserEntity {
 
     @Id
@@ -36,4 +47,7 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Double weight;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userId")
+    private List<WorkoutEntity> workout;
 }
