@@ -1,0 +1,2 @@
+ALTER TABLE tb_user ALTER COLUMN sex TYPE VARCHAR(1);
+ALTER TABLE tb_user ADD CONSTRAINT check_sex CHECK (UPPER(sex) IN ('M', 'F'));
