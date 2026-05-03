@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.service;
 
 import com.dallagnoldev.gymguy.dto.UserRequestDTO;
 import com.dallagnoldev.gymguy.dto.UserResponseDTO;
+import com.dallagnoldev.gymguy.dto.update.UserUpdateRequestDTO;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,32 +38,32 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Long userId, UserRequestDTO userRequestDTO) {
+    public UserResponseDTO updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO) {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        if (userRequestDTO.firstName() != null) {
-            userEntity.setFirstName(userRequestDTO.firstName());
+        if (userUpdateRequestDTO.firstName() != null) {
+            userEntity.setFirstName(userUpdateRequestDTO.firstName());
         }
 
-        if (userRequestDTO.lastName() != null) {
-            userEntity.setLastName(userRequestDTO.lastName());
+        if (userUpdateRequestDTO.lastName() != null) {
+            userEntity.setLastName(userUpdateRequestDTO.lastName());
         }
-        if (userRequestDTO.email() != null) {
-            userEntity.setEmail(userRequestDTO.email());
+        if (userUpdateRequestDTO.email() != null) {
+            userEntity.setEmail(userUpdateRequestDTO.email());
         }
-        if (userRequestDTO.phoneNumber() != null) {
-            userEntity.setPhoneNumber(userRequestDTO.phoneNumber());
+        if (userUpdateRequestDTO.phoneNumber() != null) {
+            userEntity.setPhoneNumber(userUpdateRequestDTO.phoneNumber());
         }
-        if (userRequestDTO.sex() != null) {
-            userEntity.setSex(userRequestDTO.sex());
-        }
-
-        if (userRequestDTO.height() != null) {
-            userEntity.setHeight(userRequestDTO.height());
+        if (userUpdateRequestDTO.sex() != null) {
+            userEntity.setSex(userUpdateRequestDTO.sex());
         }
 
-        if (userRequestDTO.weight() != null) {
-            userEntity.setWeight(userRequestDTO.weight());
+        if (userUpdateRequestDTO.height() != null) {
+            userEntity.setHeight(userUpdateRequestDTO.height());
+        }
+
+        if (userUpdateRequestDTO.weight() != null) {
+            userEntity.setWeight(userUpdateRequestDTO.weight());
         }
 
         return  toResponse(userRepository.saveAndFlush(userEntity));
