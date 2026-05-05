@@ -3,18 +3,18 @@ package com.dallagnoldev.gymguy.service;
 import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
+import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.model.WorkoutEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import com.dallagnoldev.gymguy.repository.IWorkoutRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,10 +25,24 @@ public class WorkoutService {
     private final IUserRepository userRepository;
     private final WorkoutExerciseService workoutExerciseService;
 
+
+    // future: create a strategy for different type of users
+    private static final int WORKOUT_QUANTITY_LIMIT = 10;
+
     @Transactional
-    public WorkoutResponseDTO createWorkout(Long userId, WorkoutRequestDTO workoutRequestDTO) throws NotFoundException {
+    public WorkoutResponseDTO createWorkout(Long userId, WorkoutRequestDTO workoutRequestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, WorkoutQuantityLimitException {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (workoutRepository.existsByName(workoutRequestDTO.name())) {
+            throw new WorkoutNameMustBeUniqueException("There is already exists a workout with that name");
+        }
+
+        long totalWorkouts = workoutRepository.countAllWorkoutsByUserId_UserId(userId);
+
+        if (totalWorkouts > WORKOUT_QUANTITY_LIMIT) {
+            throw new WorkoutQuantityLimitException("You reached your workout creation limit");
+        }
 
         WorkoutEntity workoutEntity = WorkoutEntity.builder()
                 .name(workoutRequestDTO.name())

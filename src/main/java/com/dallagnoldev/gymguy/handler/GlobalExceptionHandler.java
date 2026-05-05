@@ -1,7 +1,6 @@
 package com.dallagnoldev.gymguy.handler;
 
-import com.dallagnoldev.gymguy.exception.ErrorResponseDTO;
-import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,5 +27,65 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(PasswordInvalidException.class)
+    public ResponseEntity<ErrorResponseDTO> handlePasswordInvalidException(PasswordInvalidException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(WorkoutNameMustBeUniqueException.class)
+    public ResponseEntity<ErrorResponseDTO> handleWorkoutNameMustBeUniqueException(WorkoutNameMustBeUniqueException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(ExerciseNameMustBeUniqueException.class)
+    public ResponseEntity<ErrorResponseDTO> handleExerciseNameMustBeUniqueException(ExerciseNameMustBeUniqueException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(WorkoutQuantityLimitException.class)
+    public ResponseEntity<ErrorResponseDTO> handleWorkoutQuantityLimitException(WorkoutQuantityLimitException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(WorkoutExercisePositionInvalidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleWorkoutExercisePositionInvalidException(WorkoutExercisePositionInvalidException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }

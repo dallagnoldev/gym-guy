@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.controller;
 
 import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.service.ExerciseService;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class ExerciseController {
     private final ExerciseService exerciseService;
 
     @PostMapping
-    public ResponseEntity<ExerciseResponseDTO> create(@RequestBody @Valid ExerciseRequestDTO requestDTO) {
+    public ResponseEntity<ExerciseResponseDTO> create(@RequestBody @Valid ExerciseRequestDTO requestDTO) throws ExerciseNameMustBeUniqueException {
         ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(requestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

@@ -3,6 +3,8 @@ package com.dallagnoldev.gymguy.controller;
 import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
+import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
 import com.dallagnoldev.gymguy.service.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ public class WorkoutController {
     @PostMapping
     public ResponseEntity<WorkoutResponseDTO> create(
             @PathVariable Long userId,
-            @RequestBody @Valid WorkoutRequestDTO requestDTO) throws NotFoundException {
+            @RequestBody @Valid WorkoutRequestDTO requestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, WorkoutQuantityLimitException {
 
         WorkoutResponseDTO responseDTO = workoutService.createWorkout(userId, requestDTO);
         URI location = ServletUriComponentsBuilder

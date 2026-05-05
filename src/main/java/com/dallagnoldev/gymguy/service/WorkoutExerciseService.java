@@ -3,6 +3,7 @@ package com.dallagnoldev.gymguy.service;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.WorkoutExercisePositionInvalidException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.model.WorkoutEntity;
 import com.dallagnoldev.gymguy.model.WorkoutExerciseEntity;
@@ -29,11 +30,15 @@ public class WorkoutExerciseService {
     private final IExerciseRepository exerciseRepository;
 
     @Transactional
-    public WorkoutExerciseResponseDTO addExerciseToWorkout(Long workoutId, Long exerciseId, WorkoutExerciseRequestDTO requestDTO) throws NotFoundException {
+    public WorkoutExerciseResponseDTO addExerciseToWorkout(Long workoutId, Long exerciseId, WorkoutExerciseRequestDTO requestDTO) throws NotFoundException, WorkoutExercisePositionInvalidException {
         WorkoutEntity workout = workoutRepository.findById(workoutId)
                 .orElseThrow(() -> new NotFoundException("Workout not found"));
         ExerciseEntity exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new NotFoundException("Exercise not found"));
+
+        if (workoutExerciseRepository.existsByPosition(requestDTO.position())) {
+            throw new WorkoutExercisePositionInvalidException("There is already exists an exercise registered in that position");
+        }
 
         WorkoutExerciseId id = new WorkoutExerciseId(workoutId, exerciseId);
         WorkoutExerciseEntity workoutExercise = WorkoutExerciseEntity.builder()

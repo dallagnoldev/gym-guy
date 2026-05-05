@@ -3,6 +3,7 @@ package com.dallagnoldev.gymguy.controller;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.WorkoutExercisePositionInvalidException;
 import com.dallagnoldev.gymguy.service.WorkoutExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class WorkoutExerciseController {
     public ResponseEntity<WorkoutExerciseResponseDTO> addExercise(
             @PathVariable Long workoutId,
             @PathVariable Long exerciseId,
-            @RequestBody @Valid WorkoutExerciseRequestDTO requestDTO) throws NotFoundException {
+            @RequestBody @Valid WorkoutExerciseRequestDTO requestDTO) throws NotFoundException, WorkoutExercisePositionInvalidException {
 
 
         WorkoutExerciseResponseDTO workoutExerciseResponseDTO = workoutExerciseService.addExerciseToWorkout(workoutId, exerciseId, requestDTO);

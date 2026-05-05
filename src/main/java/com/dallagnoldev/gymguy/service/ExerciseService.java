@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.service;
 
 import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
@@ -22,7 +23,12 @@ public class ExerciseService {
     private final IExerciseRepository exerciseRepository;
 
     @Transactional
-    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO) {
+    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException {
+
+        if (exerciseRepository.existsByName(exerciseRequestDTO.name())) {
+            throw new ExerciseNameMustBeUniqueException("There is already an exercise with that name");
+        }
+
         ExerciseEntity exerciseEntity = ExerciseEntity.builder()
                 .name(exerciseRequestDTO.name())
                 .muscularGroup(exerciseRequestDTO.muscularGroup())

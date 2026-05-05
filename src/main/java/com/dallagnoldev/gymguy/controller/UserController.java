@@ -3,7 +3,9 @@ package com.dallagnoldev.gymguy.controller;
 import com.dallagnoldev.gymguy.dto.UserRequestDTO;
 import com.dallagnoldev.gymguy.dto.UserResponseDTO;
 import com.dallagnoldev.gymguy.dto.update.UserUpdateRequestDTO;
+import com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.PasswordInvalidException;
 import com.dallagnoldev.gymguy.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createExercise(@RequestBody @Valid UserRequestDTO userRequestDTO) {
+    public ResponseEntity<UserResponseDTO> createExercise(@RequestBody @Valid UserRequestDTO userRequestDTO) throws EmailAlreadyExistsException, PasswordInvalidException {
         UserResponseDTO userResponseDTO = userService.createUser(userRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

@@ -9,4 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface IWorkoutRepository extends JpaRepository<WorkoutEntity, Long> {
 
     Page<WorkoutEntity> findAllWorkoutsByUserId_UserId(Long userId, Pageable pageable);
+
+    boolean existsByName(String name);
+
+    long countAllWorkoutsByUserId_UserId(Long userId);
 }

@@ -3,9 +3,13 @@ package com.dallagnoldev.gymguy.service;
 import com.dallagnoldev.gymguy.dto.UserRequestDTO;
 import com.dallagnoldev.gymguy.dto.UserResponseDTO;
 import com.dallagnoldev.gymguy.dto.update.UserUpdateRequestDTO;
+import com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.PasswordInvalidException;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
+import com.dallagnoldev.gymguy.util.PasswordHelper;
+import com.dallagnoldev.gymguy.util.PasswordResponseValidation;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +21,18 @@ public class UserService {
 
     private final IUserRepository userRepository;
 
-    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) throws EmailAlreadyExistsException, PasswordInvalidException {
+
+        if (userRepository.existsByEmail(userRequestDTO.email())) {
+            throw new EmailAlreadyExistsException("Email already in use");
+        }
+
+        PasswordResponseValidation responseValidation = PasswordHelper.validatePassword(userRequestDTO.password());
+
+        if (!responseValidation.isValid()) {
+            throw new PasswordInvalidException(responseValidation.message());
+        }
+
         UserEntity userEntity = UserEntity.builder()
                 .firstName(userRequestDTO.firstName())
                 .lastName(userRequestDTO.lastName())

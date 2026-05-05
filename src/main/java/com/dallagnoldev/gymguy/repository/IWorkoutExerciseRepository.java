@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface IWorkoutExerciseRepository extends JpaRepository<WorkoutExerciseEntity, WorkoutExerciseId> {
 
     Page<WorkoutExerciseEntity> findAllByWorkout_WorkoutId(Pageable pageable, Long workoutId);
+
+    boolean existsByPosition(Integer position);
 }
