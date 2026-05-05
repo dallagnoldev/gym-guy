@@ -5,6 +5,10 @@ import com.dallagnoldev.gymguy.dto.WorkoutExerciseResponseDTO;
 import com.dallagnoldev.gymguy.service.WorkoutExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +42,13 @@ public class WorkoutExerciseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WorkoutExerciseResponseDTO>> findByWorkout(@PathVariable Long workoutId) {
-        return ResponseEntity.ok(workoutExerciseService.findExercisesByWorkoutId(workoutId));
+    public ResponseEntity<Page<WorkoutExerciseResponseDTO>> findByWorkout(
+            @PathVariable Long workoutId,
+            @PageableDefault(sort = "position", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        Page<WorkoutExerciseResponseDTO> workoutExerciseResponseDTO = workoutExerciseService.findExercisesByWorkoutId(workoutId, pageable);
+
+        return ResponseEntity.ok(workoutExerciseResponseDTO);
     }
 
     @DeleteMapping("/{exerciseId}")

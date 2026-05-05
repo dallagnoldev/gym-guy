@@ -5,6 +5,10 @@ import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.service.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +40,13 @@ public class WorkoutController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WorkoutResponseDTO>> findAllByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(workoutService.findAllWorkoutsByUserId(userId));
+    public ResponseEntity<Page<WorkoutResponseDTO>> findAllByUser(
+            @PathVariable Long userId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<WorkoutResponseDTO> workoutResponseDTO = workoutService.findAllWorkoutsByUserId(pageable, userId);
+
+        return ResponseEntity.ok(workoutResponseDTO);
     }
 
     @GetMapping("/{workoutId}")

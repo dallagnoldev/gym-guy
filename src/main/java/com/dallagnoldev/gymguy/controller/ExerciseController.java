@@ -5,6 +5,10 @@ import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
 import com.dallagnoldev.gymguy.service.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +42,12 @@ public class ExerciseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExerciseResponseDTO>> findAll() {
-        return ResponseEntity.ok(exerciseService.findAllExercises());
+    public ResponseEntity<Page<ExerciseResponseDTO>> findAll(
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        Page<ExerciseResponseDTO> exerciseResponseDTO = exerciseService.findAllExercises(pageable);
+
+        return ResponseEntity.ok(exerciseResponseDTO);
     }
 
     @GetMapping("/search")
@@ -48,8 +56,12 @@ public class ExerciseController {
     }
 
     @GetMapping("/muscular-group")
-    public ResponseEntity<List<ExerciseResponseDTO>> findByMuscularGroup(@RequestParam String group) {
-        return ResponseEntity.ok(exerciseService.findExercisesByMuscularGroup(group));
+    public ResponseEntity<Page<ExerciseResponseDTO>> findByMuscularGroup(
+            @RequestParam String group,
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        Page<ExerciseResponseDTO> exerciseResponseDTO = exerciseService.findExercisesByMuscularGroup(pageable, group);
+        return ResponseEntity.ok(exerciseResponseDTO);
     }
 
     @DeleteMapping("/{id}")

@@ -11,6 +11,8 @@ import com.dallagnoldev.gymguy.repository.IWorkoutExerciseRepository;
 import com.dallagnoldev.gymguy.repository.IWorkoutRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,15 +49,15 @@ public class WorkoutExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkoutExerciseResponseDTO> findExercisesByWorkoutId(Long workoutId) {
+    public Page<WorkoutExerciseResponseDTO> findExercisesByWorkoutId(Long workoutId, Pageable pageable) {
         if (!workoutRepository.existsById(workoutId)) {
             throw new EntityNotFoundException("Workout not found");
         }
 
-        return workoutExerciseRepository.findAll().stream()
-                .filter(we -> we.getId().getWorkoutId().equals(workoutId))
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        Page<WorkoutExerciseEntity> workoutExerciseEntityPage = workoutExerciseRepository.findAllByWorkout_WorkoutId(pageable, workoutId);
+
+        return workoutExerciseEntityPage.map(this::toResponse);
+
     }
 
     @Transactional

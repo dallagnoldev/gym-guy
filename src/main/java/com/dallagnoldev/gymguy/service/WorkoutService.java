@@ -8,6 +8,8 @@ import com.dallagnoldev.gymguy.repository.IUserRepository;
 import com.dallagnoldev.gymguy.repository.IWorkoutRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,15 +46,14 @@ public class WorkoutService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkoutResponseDTO> findAllWorkoutsByUserId(Long userId) {
+    public Page<WorkoutResponseDTO> findAllWorkoutsByUserId(Pageable pageable, Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User not found");
         }
-        
-        return workoutRepository.findAll().stream()
-                .filter(w -> w.getUserId().getUserId().equals(userId))
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+
+        Page<WorkoutEntity> workoutEntityPage = workoutRepository.findAllWorkoutsByUserId_UserId(userId, pageable);
+
+        return workoutEntityPage.map(this::toResponse);
     }
 
     @Transactional

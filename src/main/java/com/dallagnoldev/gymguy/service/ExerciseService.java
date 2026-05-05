@@ -6,6 +6,8 @@ import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +38,11 @@ public class ExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public List<ExerciseResponseDTO> findAllExercises() {
-        return exerciseRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public Page<ExerciseResponseDTO> findAllExercises(Pageable pageable) {
+
+        Page<ExerciseEntity> exerciseEntityPage = exerciseRepository.findAll(pageable);
+
+        return exerciseEntityPage.map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -50,10 +53,11 @@ public class ExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public List<ExerciseResponseDTO> findExercisesByMuscularGroup(String muscularGroup) {
-        return exerciseRepository.findByMuscularGroupIgnoreCase(muscularGroup).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public Page<ExerciseResponseDTO> findExercisesByMuscularGroup(Pageable pageable, String muscularGroup) {
+
+        Page<ExerciseEntity> exerciseEntityPage = exerciseRepository.findByMuscularGroupIgnoreCase(pageable, muscularGroup);
+
+        return exerciseEntityPage.map(this::toResponse);
     }
 
     @Transactional
