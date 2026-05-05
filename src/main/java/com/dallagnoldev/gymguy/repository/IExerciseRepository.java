@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface IExerciseRepository extends JpaRepository<ExerciseEntity, Long> {
 
-    Optional<ExerciseEntity> findByName(String name);
+    Optional<ExerciseEntity> findByNameIgnoreCase(String name);
 
-    List<ExerciseEntity> findByMuscularGroup(String muscularGroup);
+    List<ExerciseEntity> findByMuscularGroupIgnoreCase(String muscularGroup);
 }

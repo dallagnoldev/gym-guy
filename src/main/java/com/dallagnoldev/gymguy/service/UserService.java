@@ -23,6 +23,7 @@ public class UserService {
                 .email(userRequestDTO.email())
                 .password(userRequestDTO.password())
                 .phoneNumber(userRequestDTO.phoneNumber())
+                .birthDate(userRequestDTO.birthDate())
                 .sex(userRequestDTO.sex())
                 .height(userRequestDTO.height())
                 .weight(userRequestDTO.weight())
@@ -53,6 +54,9 @@ public class UserService {
         }
         if (userUpdateRequestDTO.phoneNumber() != null) {
             userEntity.setPhoneNumber(userUpdateRequestDTO.phoneNumber());
+        }
+        if(userUpdateRequestDTO.birthDate() != null) {
+            userEntity.setBirthDate(userUpdateRequestDTO.birthDate());
         }
         if (userUpdateRequestDTO.sex() != null) {
             userEntity.setSex(userUpdateRequestDTO.sex());
@@ -85,9 +89,12 @@ public class UserService {
                 userEntity.getLastName(),
                 userEntity.getEmail(),
                 userEntity.getPhoneNumber(),
+                userEntity.getBirthDate(),
                 userEntity.getSex(),
                 userEntity.getHeight(),
-                userEntity.getWeight()
+                userEntity.getWeight(),
+                userEntity.getCreatedAt(),
+                userEntity.getUpdatedAt()
         );
     }
 }

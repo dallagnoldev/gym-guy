@@ -2,8 +2,11 @@ package com.dallagnoldev.gymguy.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Entity
 @Table(name = "tb_exercise")
@@ -27,4 +30,12 @@ public class ExerciseEntity implements Serializable {
 
     @Column(nullable = false, name = "muscular_group")
     private String muscularGroup;
+
+    @CreationTimestamp
+    @Column(nullable = false, name = "created_at")
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }

@@ -70,7 +70,9 @@ public class WorkoutService {
                 workoutEntity.getDescription(),
                 workoutEntity.getExercises().stream()
                         .map(workoutExerciseService::toResponse)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                workoutEntity.getCreatedAt(),
+                workoutEntity.getUpdatedAt()
         );
     }
 }

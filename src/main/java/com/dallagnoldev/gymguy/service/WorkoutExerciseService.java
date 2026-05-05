@@ -74,7 +74,9 @@ public class WorkoutExerciseService {
                 entity.getWeight(),
                 entity.getReps(),
                 entity.getSets(),
-                entity.getPosition()
+                entity.getPosition(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

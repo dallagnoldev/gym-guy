@@ -3,8 +3,12 @@ package com.dallagnoldev.gymguy.model;
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -39,6 +43,9 @@ public class UserEntity implements Serializable {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+    @Column(nullable = false, name = "birth_date")
+    private LocalDate birthDate;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserSexEnum sex;
@@ -51,4 +58,12 @@ public class UserEntity implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userId")
     private List<WorkoutEntity> workout;
+
+    @CreationTimestamp
+    @Column(nullable = false, name = "created_at")
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }

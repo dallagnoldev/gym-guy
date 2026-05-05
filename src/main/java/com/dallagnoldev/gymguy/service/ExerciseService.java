@@ -44,14 +44,14 @@ public class ExerciseService {
 
     @Transactional(readOnly = true)
     public ExerciseResponseDTO findExerciseByName(String name) {
-        ExerciseEntity exerciseEntity = exerciseRepository.findByName(name)
+        ExerciseEntity exerciseEntity = exerciseRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new EntityNotFoundException("Exercise not found"));
         return toResponse(exerciseEntity);
     }
 
     @Transactional(readOnly = true)
     public List<ExerciseResponseDTO> findExercisesByMuscularGroup(String muscularGroup) {
-        return exerciseRepository.findByMuscularGroup(muscularGroup).stream()
+        return exerciseRepository.findByMuscularGroupIgnoreCase(muscularGroup).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -68,7 +68,9 @@ public class ExerciseService {
         return new ExerciseResponseDTO(
                 exerciseEntity.getExerciseid(),
                 exerciseEntity.getName(),
-                exerciseEntity.getMuscularGroup()
+                exerciseEntity.getMuscularGroup(),
+                exerciseEntity.getCreatedAt(),
+                exerciseEntity.getUpdatedAt()
         );
     }
 }
