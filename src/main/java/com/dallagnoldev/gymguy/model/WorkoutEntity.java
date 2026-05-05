@@ -38,6 +38,7 @@ public class WorkoutEntity implements Serializable {
     private UserEntity userId;
 
     @Builder.Default
+    @OrderBy("position ASC")
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkoutExerciseEntity> exercises = new ArrayList<>();
 
