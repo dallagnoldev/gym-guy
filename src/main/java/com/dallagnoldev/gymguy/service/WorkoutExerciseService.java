@@ -69,8 +69,8 @@ public class WorkoutExerciseService {
 
     public WorkoutExerciseResponseDTO toResponse(WorkoutExerciseEntity entity) {
         return new WorkoutExerciseResponseDTO(
-                entity.getId().getWorkoutId(),
                 entity.getId().getExerciseId(),
+                entity.getExercise().getName(),
                 entity.getWeight(),
                 entity.getReps(),
                 entity.getSets(),
