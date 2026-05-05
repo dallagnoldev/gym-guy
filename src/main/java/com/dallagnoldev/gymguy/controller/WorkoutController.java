@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.controller;
 
 import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.service.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class WorkoutController {
     @PostMapping
     public ResponseEntity<WorkoutResponseDTO> create(
             @PathVariable Long userId,
-            @RequestBody @Valid WorkoutRequestDTO requestDTO) {
+            @RequestBody @Valid WorkoutRequestDTO requestDTO) throws NotFoundException {
 
         WorkoutResponseDTO responseDTO = workoutService.createWorkout(userId, requestDTO);
         URI location = ServletUriComponentsBuilder
@@ -42,7 +43,7 @@ public class WorkoutController {
     @GetMapping
     public ResponseEntity<Page<WorkoutResponseDTO>> findAllByUser(
             @PathVariable Long userId,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) throws NotFoundException {
 
         Page<WorkoutResponseDTO> workoutResponseDTO = workoutService.findAllWorkoutsByUserId(pageable, userId);
 
@@ -50,12 +51,12 @@ public class WorkoutController {
     }
 
     @GetMapping("/{workoutId}")
-    public ResponseEntity<WorkoutResponseDTO> findById(@PathVariable Long workoutId) {
+    public ResponseEntity<WorkoutResponseDTO> findById(@PathVariable Long workoutId) throws NotFoundException {
         return ResponseEntity.ok(workoutService.findWorkoutById(workoutId));
     }
 
     @DeleteMapping("/{workoutId}")
-    public ResponseEntity<Void> delete(@PathVariable Long workoutId) {
+    public ResponseEntity<Void> delete(@PathVariable Long workoutId) throws NotFoundException {
         workoutService.deleteWorkout(workoutId);
         return ResponseEntity.noContent().build();
     }

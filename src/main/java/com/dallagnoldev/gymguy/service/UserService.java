@@ -3,6 +3,7 @@ package com.dallagnoldev.gymguy.service;
 import com.dallagnoldev.gymguy.dto.UserRequestDTO;
 import com.dallagnoldev.gymguy.dto.UserResponseDTO;
 import com.dallagnoldev.gymguy.dto.update.UserUpdateRequestDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,14 +34,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDTO findUserById(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public UserResponseDTO findUserById(Long userId) throws NotFoundException {
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         return toResponse(userEntity);
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public UserResponseDTO updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException {
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
         if (userUpdateRequestDTO.firstName() != null) {
             userEntity.setFirstName(userUpdateRequestDTO.firstName());
@@ -74,9 +75,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId) throws NotFoundException {
         if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
 
         userRepository.deleteById(userId);

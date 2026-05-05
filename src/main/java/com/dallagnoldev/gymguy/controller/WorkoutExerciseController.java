@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.controller;
 
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.service.WorkoutExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class WorkoutExerciseController {
     public ResponseEntity<WorkoutExerciseResponseDTO> addExercise(
             @PathVariable Long workoutId,
             @PathVariable Long exerciseId,
-            @RequestBody @Valid WorkoutExerciseRequestDTO requestDTO) {
+            @RequestBody @Valid WorkoutExerciseRequestDTO requestDTO) throws NotFoundException {
 
 
         WorkoutExerciseResponseDTO workoutExerciseResponseDTO = workoutExerciseService.addExerciseToWorkout(workoutId, exerciseId, requestDTO);
@@ -44,7 +45,7 @@ public class WorkoutExerciseController {
     @GetMapping
     public ResponseEntity<Page<WorkoutExerciseResponseDTO>> findByWorkout(
             @PathVariable Long workoutId,
-            @PageableDefault(sort = "position", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(sort = "position", direction = Sort.Direction.ASC) Pageable pageable) throws NotFoundException {
 
         Page<WorkoutExerciseResponseDTO> workoutExerciseResponseDTO = workoutExerciseService.findExercisesByWorkoutId(workoutId, pageable);
 
@@ -52,7 +53,7 @@ public class WorkoutExerciseController {
     }
 
     @DeleteMapping("/{exerciseId}")
-    public ResponseEntity<Void> removeExercise(@PathVariable Long workoutId, @PathVariable Long exerciseId) {
+    public ResponseEntity<Void> removeExercise(@PathVariable Long workoutId, @PathVariable Long exerciseId) throws NotFoundException {
         workoutExerciseService.removeExerciseFromWorkout(workoutId, exerciseId);
         return ResponseEntity.noContent().build();
     }

@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.service;
 
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.model.WorkoutEntity;
 import com.dallagnoldev.gymguy.model.WorkoutExerciseEntity;
@@ -28,11 +29,11 @@ public class WorkoutExerciseService {
     private final IExerciseRepository exerciseRepository;
 
     @Transactional
-    public WorkoutExerciseResponseDTO addExerciseToWorkout(Long workoutId, Long exerciseId, WorkoutExerciseRequestDTO requestDTO) {
+    public WorkoutExerciseResponseDTO addExerciseToWorkout(Long workoutId, Long exerciseId, WorkoutExerciseRequestDTO requestDTO) throws NotFoundException {
         WorkoutEntity workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() -> new EntityNotFoundException("Workout not found"));
+                .orElseThrow(() -> new NotFoundException("Workout not found"));
         ExerciseEntity exercise = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> new EntityNotFoundException("Exercise not found"));
+                .orElseThrow(() -> new NotFoundException("Exercise not found"));
 
         WorkoutExerciseId id = new WorkoutExerciseId(workoutId, exerciseId);
         WorkoutExerciseEntity workoutExercise = WorkoutExerciseEntity.builder()
@@ -49,9 +50,9 @@ public class WorkoutExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public Page<WorkoutExerciseResponseDTO> findExercisesByWorkoutId(Long workoutId, Pageable pageable) {
+    public Page<WorkoutExerciseResponseDTO> findExercisesByWorkoutId(Long workoutId, Pageable pageable) throws NotFoundException {
         if (!workoutRepository.existsById(workoutId)) {
-            throw new EntityNotFoundException("Workout not found");
+            throw new NotFoundException("Workout not found");
         }
 
         Page<WorkoutExerciseEntity> workoutExerciseEntityPage = workoutExerciseRepository.findAllByWorkout_WorkoutId(pageable, workoutId);
@@ -61,10 +62,10 @@ public class WorkoutExerciseService {
     }
 
     @Transactional
-    public void removeExerciseFromWorkout(Long workoutId, Long exerciseId) {
+    public void removeExerciseFromWorkout(Long workoutId, Long exerciseId) throws NotFoundException {
         WorkoutExerciseId id = new WorkoutExerciseId(workoutId, exerciseId);
         if (!workoutExerciseRepository.existsById(id)) {
-            throw new EntityNotFoundException("WorkoutExercise not found");
+            throw new NotFoundException("Workout Exercise not found");
         }
         workoutExerciseRepository.deleteById(id);
     }

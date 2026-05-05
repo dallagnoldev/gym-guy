@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.service;
 
 import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,9 +32,9 @@ public class ExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public ExerciseResponseDTO findExerciseById(Long exerciseId) {
+    public ExerciseResponseDTO findExerciseById(Long exerciseId) throws NotFoundException {
         ExerciseEntity exerciseEntity = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> new EntityNotFoundException("Exercise not found"));
+                .orElseThrow(() -> new NotFoundException("Exercise not found"));
         return toResponse(exerciseEntity);
     }
 
@@ -46,9 +47,9 @@ public class ExerciseService {
     }
 
     @Transactional(readOnly = true)
-    public ExerciseResponseDTO findExerciseByName(String name) {
+    public ExerciseResponseDTO findExerciseByName(String name) throws NotFoundException {
         ExerciseEntity exerciseEntity = exerciseRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new EntityNotFoundException("Exercise not found"));
+                .orElseThrow(() -> new NotFoundException("Exercise not found"));
         return toResponse(exerciseEntity);
     }
 
@@ -61,9 +62,9 @@ public class ExerciseService {
     }
 
     @Transactional
-    public void deleteExercise(Long exerciseId) {
+    public void deleteExercise(Long exerciseId) throws NotFoundException {
         if (!exerciseRepository.existsById(exerciseId)) {
-            throw new EntityNotFoundException("Exercise not found");
+            throw new NotFoundException("Exercise not found");
         }
         exerciseRepository.deleteById(exerciseId);
     }

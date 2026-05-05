@@ -2,6 +2,7 @@ package com.dallagnoldev.gymguy.controller;
 
 import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
+import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.service.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class ExerciseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExerciseResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<ExerciseResponseDTO> findById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(exerciseService.findExerciseById(id));
     }
 
@@ -51,7 +52,7 @@ public class ExerciseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ExerciseResponseDTO> findByName(@RequestParam String name) {
+    public ResponseEntity<ExerciseResponseDTO> findByName(@RequestParam String name) throws NotFoundException {
         return ResponseEntity.ok(exerciseService.findExerciseByName(name));
     }
 
@@ -65,7 +66,7 @@ public class ExerciseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws NotFoundException {
         exerciseService.deleteExercise(id);
         return ResponseEntity.noContent().build();
     }
