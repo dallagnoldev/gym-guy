@@ -40,7 +40,7 @@ public class WorkoutService {
 
         long totalWorkouts = workoutRepository.countAllWorkoutsByUserId_UserId(userId);
 
-        if (totalWorkouts > WORKOUT_QUANTITY_LIMIT) {
+        if (totalWorkouts >= WORKOUT_QUANTITY_LIMIT) {
             throw new WorkoutQuantityLimitException("You reached your workout creation limit");
         }
 
