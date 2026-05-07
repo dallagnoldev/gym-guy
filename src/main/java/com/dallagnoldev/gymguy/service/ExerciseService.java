@@ -6,7 +6,6 @@ import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,7 @@ public class ExerciseService {
     @Transactional
     public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException {
 
-        if (exerciseRepository.existsByName(exerciseRequestDTO.name())) {
+        if (exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())) {
             throw new ExerciseNameMustBeUniqueException("There is already an exercise with that name");
         }
 

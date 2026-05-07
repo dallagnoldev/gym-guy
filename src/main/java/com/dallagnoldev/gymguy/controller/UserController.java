@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @RequestBody @Valid UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @RequestBody @Valid UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException, EmailAlreadyExistsException {
         UserResponseDTO userResponseDTO = userService.updateUser(userId, userUpdateRequestDTO);
 
         return ResponseEntity.ok(userResponseDTO);

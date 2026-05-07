@@ -16,4 +16,6 @@ public interface IExerciseRepository extends JpaRepository<ExerciseEntity, Long>
     Page<ExerciseEntity> findByMuscularGroupIgnoreCase(Pageable pageable, String muscularGroup);
 
     boolean existsByName(String name);
+
+    boolean existsByNameIgnoreCase(String name);
 }
