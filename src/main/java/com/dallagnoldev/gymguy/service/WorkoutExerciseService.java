@@ -11,7 +11,6 @@ import com.dallagnoldev.gymguy.model.embeddable.WorkoutExerciseId;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
 import com.dallagnoldev.gymguy.repository.IWorkoutExerciseRepository;
 import com.dallagnoldev.gymguy.repository.IWorkoutRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

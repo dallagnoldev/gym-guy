@@ -10,6 +10,7 @@ import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,6 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should create user successfully")
     public void shouldCreateUserSuccessfully() throws EmailAlreadyExistsException, PasswordInvalidException {
         when(userRepository.existsByEmail(userRequestDTO.email())).thenReturn(false);
 
@@ -66,6 +68,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw EmailAlreadyExistsException when email is already taken")
     public void shouldThrowExceptionWhenEmailAlreadyExistsException() throws EmailAlreadyExistsException {
         when(userRepository.existsByEmail(userRequestDTO.email())).thenReturn(true);
 
@@ -77,6 +80,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should find user by id successfully")
     public void shouldFindUserByIdSuccessfully() throws NotFoundException {
         Long userId = 1L;
 
@@ -100,6 +104,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when user id does not exist")
     public void shouldThrowExceptionWhenIdDoesNotExist() {
         Long id = 99L;
 
@@ -113,6 +118,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should update user successfully")
     public void shouldUpdatedUserSuccessfully() throws NotFoundException, EmailAlreadyExistsException {
         Long id = 1L;
 
@@ -153,6 +159,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw EmailAlreadyExistsException when updating to an email already in use")
     public void shouldThrowExceptionWhenUpdatingToExistingEmail() {
         Long id = 1L;
         String existingEmail = "other@gmail.com";
@@ -175,6 +182,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw PasswordInvalidException when password format is invalid")
     public void shouldThrowExceptionWhenPasswordIsInvalid() {
         UserRequestDTO invalidPasswordDTO = new UserRequestDTO(
                 "Angelica", "Ferreira", "angelica@gmail.com",
@@ -192,6 +200,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when updating a non-existent user")
     public void shouldThrowExceptionWhenUpdatingNonExistentUser() {
         Long id = 99L;
         UserUpdateRequestDTO newData = new UserUpdateRequestDTO(
@@ -209,6 +218,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should delete user successfully")
     public void shouldDeleteUserSuccessfully() throws NotFoundException {
         Long userId = 1L;
 
@@ -221,6 +231,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when deleting a non-existent user")
     public void shouldThrowExceptionWhenDeletingNonExistentUser() {
         Long userId = 1L;
 
