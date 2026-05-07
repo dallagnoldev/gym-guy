@@ -55,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException {
+    public UserResponseDTO updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException, EmailAlreadyExistsException {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
         if (userUpdateRequestDTO.firstName() != null) {
@@ -66,6 +66,9 @@ public class UserService {
             userEntity.setLastName(userUpdateRequestDTO.lastName());
         }
         if (userUpdateRequestDTO.email() != null) {
+            if (!userEntity.getEmail().equals(userUpdateRequestDTO.email()) && userRepository.existsByEmail(userUpdateRequestDTO.email())) {
+                throw new EmailAlreadyExistsException("Email already in use");
+            }
             userEntity.setEmail(userUpdateRequestDTO.email());
         }
         if (userUpdateRequestDTO.phoneNumber() != null) {
