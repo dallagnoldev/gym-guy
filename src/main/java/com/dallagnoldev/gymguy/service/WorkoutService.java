@@ -34,7 +34,7 @@ public class WorkoutService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if (workoutRepository.existsByName(workoutRequestDTO.name())) {
+        if (workoutRepository.existsByNameIgnoreCase(workoutRequestDTO.name())) {
             throw new WorkoutNameMustBeUniqueException("There is already exists a workout with that name");
         }
 

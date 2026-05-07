@@ -14,5 +14,7 @@ public interface IWorkoutRepository extends JpaRepository<WorkoutEntity, Long> {
 
     boolean existsByName(String name);
 
+    boolean existsByNameIgnoreCase(String name);
+
     long countAllWorkoutsByUserId_UserId(Long userId);
 }
