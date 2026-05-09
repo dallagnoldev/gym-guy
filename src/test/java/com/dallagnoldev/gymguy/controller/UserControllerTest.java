@@ -128,7 +128,7 @@ public class UserControllerTest {
 
         UserResponseDTO response = new UserResponseDTO(
                 userId,
-                "Jhonny",
+                "Johnny",
                 userRequestDTO.lastName(),
                 userRequestDTO.email(),
                 userRequestDTO.phoneNumber(),
@@ -147,7 +147,7 @@ public class UserControllerTest {
                 .content(objectMapper.writeValueAsString(userUpdateRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.firstName").value("Jhonny"));
+                .andExpect(jsonPath("$.firstName").value("Johnny"));
 
         verify(userService, times(1)).updateUser(eq(userId), any(UserUpdateRequestDTO.class));
     }
