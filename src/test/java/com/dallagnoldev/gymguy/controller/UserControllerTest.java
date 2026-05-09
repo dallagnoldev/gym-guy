@@ -161,4 +161,86 @@ public class UserControllerTest {
 
         verify(userService, times(1)).deleteUser(1L);
     }
+
+    @Test
+    public void shouldReturnConflictWhenEmailAlreadyExists() throws Exception {
+        when(userService.createUser(any())).thenThrow(new com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException("Email already exists"));
+
+        mockMvc.perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRequestDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email already exists"))
+                .andExpect(jsonPath("$.status").value(409));
+
+        verify(userService, times(1)).createUser(any());
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenPasswordIsInvalid() throws Exception {
+        when(userService.createUser(any())).thenThrow(new com.dallagnoldev.gymguy.exception.PasswordInvalidException("Password invalid"));
+
+        mockMvc.perform(post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRequestDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Password invalid"))
+                .andExpect(jsonPath("$.status").value(400));
+
+        verify(userService, times(1)).createUser(any());
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenUserIdDoesNotExist() throws Exception {
+        when(userService.findUserById(1L)).thenThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("User not found"));
+
+        mockMvc.perform(get("/api/v1/users/{userId}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(userService, times(1)).findUserById(1L);
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
+        UserUpdateRequestDTO updateDTO = new UserUpdateRequestDTO("James", "Bond", "james@bond.com", "40028922", LocalDate.of(2002, 10, 2), UserSexEnum.M, 1.77, 75.0);
+        when(userService.updateUser(eq(1L), any())).thenThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("User not found"));
+
+        mockMvc.perform(patch("/api/v1/users/{userId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(userService, times(1)).updateUser(eq(1L), any());
+    }
+
+    @Test
+    public void shouldReturnConflictWhenUpdatingToExistingEmail() throws Exception {
+        UserUpdateRequestDTO updateDTO = new UserUpdateRequestDTO("James", "Bond", "existing@email.com", "40028922", LocalDate.of(2002, 10, 2), UserSexEnum.M, 1.77, 75.0);
+        when(userService.updateUser(eq(1L), any())).thenThrow(new com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException("Email already exists"));
+
+        mockMvc.perform(patch("/api/v1/users/{userId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email already exists"))
+                .andExpect(jsonPath("$.status").value(409));
+
+        verify(userService, times(1)).updateUser(eq(1L), any());
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenDeletingNonExistentUser() throws Exception {
+        doThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("User not found")).when(userService).deleteUser(1L);
+
+        mockMvc.perform(delete("/api/v1/users/{userId}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(userService, times(1)).deleteUser(1L);
+    }
 }
