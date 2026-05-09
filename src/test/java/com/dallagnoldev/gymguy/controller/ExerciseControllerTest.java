@@ -177,4 +177,56 @@ public class ExerciseControllerTest {
 
         verify(exerciseService, times(1)).deleteExercise(1L);
     }
+
+    @Test
+    public void shouldReturnConflictWhenExerciseNameAlreadyExists() throws Exception {
+        when(exerciseService.createExercise(any())).thenThrow(new com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException("Exercise name already exists"));
+
+        mockMvc.perform(post("/api/v1/exercises")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectmapper.writeValueAsString(exerciseRequestDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Exercise name already exists"))
+                .andExpect(jsonPath("$.status").value(409));
+
+        verify(exerciseService, times(1)).createExercise(any());
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenExerciseIdDoesNotExist() throws Exception {
+        when(exerciseService.findExerciseById(1L)).thenThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("Exercise not found"));
+
+        mockMvc.perform(get("/api/v1/exercises/{id}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Exercise not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(exerciseService, times(1)).findExerciseById(1L);
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenExerciseNameDoesNotExist() throws Exception {
+        String exerciseName = "Non Existent";
+        when(exerciseService.findExerciseByName(exerciseName)).thenThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("Exercise not found"));
+
+        mockMvc.perform(get("/api/v1/exercises/search")
+                        .param("name", exerciseName))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Exercise not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(exerciseService, times(1)).findExerciseByName(exerciseName);
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenDeletingNonExistentExercise() throws Exception {
+        doThrow(new com.dallagnoldev.gymguy.exception.NotFoundException("Exercise not found")).when(exerciseService).deleteExercise(1L);
+
+        mockMvc.perform(delete("/api/v1/exercises/{id}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Exercise not found"))
+                .andExpect(jsonPath("$.status").value(404));
+
+        verify(exerciseService, times(1)).deleteExercise(1L);
+    }
 }
