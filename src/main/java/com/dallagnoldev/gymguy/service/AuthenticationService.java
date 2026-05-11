@@ -83,7 +83,7 @@ public class AuthenticationService {
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException(ex.getMessage());
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new Exception("Internal Error", e);
         }
     }
 
