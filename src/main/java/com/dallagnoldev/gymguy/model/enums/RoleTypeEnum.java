@@ -1,6 +1,6 @@
 package com.dallagnoldev.gymguy.model.enums;
 
 public enum RoleTypeEnum {
-    USER,
-    ADMIN
+    ROLE_USER,
+    ROLE_ADMIN
 }
