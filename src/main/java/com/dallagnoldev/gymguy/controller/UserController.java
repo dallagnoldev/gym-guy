@@ -10,6 +10,7 @@ import com.dallagnoldev.gymguy.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -34,6 +35,7 @@ public class UserController {
         return ResponseEntity.created(location).body(userResponseDTO);
     }
 
+    @PreAuthorize("#userId  == authentication.principal.userId or hasRole('ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable Long userId) throws NotFoundException {
         UserResponseDTO userResponseDTO = userService.findUserById(userId);
@@ -41,6 +43,7 @@ public class UserController {
         return ResponseEntity.ok(userResponseDTO);
     }
 
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ADMIN')")
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @RequestBody @Valid UserUpdateRequestDTO userUpdateRequestDTO) throws NotFoundException, EmailAlreadyExistsException {
         UserResponseDTO userResponseDTO = userService.updateUser(userId, userUpdateRequestDTO);
@@ -48,6 +51,7 @@ public class UserController {
         return ResponseEntity.ok(userResponseDTO);
     }
 
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?>  deleteUser(@PathVariable Long userId) throws NotFoundException {
         userService.deleteUser(userId);

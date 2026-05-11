@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,6 +28,7 @@ public class WorkoutController {
 
     private final WorkoutService workoutService;
 
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<WorkoutResponseDTO> create(
             @PathVariable Long userId,
