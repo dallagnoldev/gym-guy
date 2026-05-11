@@ -105,6 +105,14 @@ public class AuthServiceTest {
     }
 
     @Test
+    public void shouldThrowEmailAlreadyExistsException() throws EmailAlreadyExistsException {
+        when(userRepository.existsByEmail(registerRequestDTO.email())).thenReturn(true);
+        assertThrows(EmailAlreadyExistsException.class, () -> authenticationService.register(registerRequestDTO));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
     public void shouldLoginUserSuccessfully() throws Exception {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
