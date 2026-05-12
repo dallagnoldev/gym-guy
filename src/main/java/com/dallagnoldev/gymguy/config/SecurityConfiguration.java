@@ -44,8 +44,8 @@ public class SecurityConfiguration {
                         }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/exercises/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/exercises/**").authenticated()
+                        .requestMatchers("/api/v1/exercises/**").hasRole("ADMIN")
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui/index.html").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
