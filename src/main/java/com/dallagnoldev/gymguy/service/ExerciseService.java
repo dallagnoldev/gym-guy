@@ -5,7 +5,9 @@ import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
+import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
+import com.dallagnoldev.gymguy.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,17 +22,25 @@ import java.util.stream.Collectors;
 public class ExerciseService {
 
     private final IExerciseRepository exerciseRepository;
+    private final IUserRepository userRepository;
 
     @Transactional
-    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException {
+    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO, Long userId) throws ExerciseNameMustBeUniqueException {
 
         if (exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())) {
             throw new ExerciseNameMustBeUniqueException("There is already an exercise with that name");
         }
 
+        UserEntity exerciseOwner = null;
+
+        if (userId != null) {
+            exerciseOwner = userRepository.getReferenceById(userId);
+        }
+
         ExerciseEntity exerciseEntity = ExerciseEntity.builder()
                 .name(exerciseRequestDTO.name())
                 .muscularGroup(exerciseRequestDTO.muscularGroup())
+                .user(exerciseOwner)
                 .build();
 
         return toResponse(exerciseRepository.save(exerciseEntity));

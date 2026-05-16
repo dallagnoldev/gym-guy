@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,9 +27,27 @@ public class ExerciseController {
 
     private final ExerciseService exerciseService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ExerciseResponseDTO> create(@RequestBody @Valid ExerciseRequestDTO requestDTO) throws ExerciseNameMustBeUniqueException {
-        ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(requestDTO);
+        ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(requestDTO, null);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(exerciseResponseDTO.exerciseId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(exerciseResponseDTO);
+    }
+
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ADMIN')")
+    @PostMapping("/{userId}")
+    public ResponseEntity<ExerciseResponseDTO> createCustomExercise(
+            @PathVariable Long userId,
+            @RequestBody @Valid ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException {
+
+        ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(exerciseRequestDTO, userId);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
