@@ -31,6 +31,10 @@ public class ExerciseEntity implements Serializable {
     @Column(nullable = false, name = "muscular_group")
     private String muscularGroup;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     @CreationTimestamp
     @Column(nullable = false, name = "created_at")
     private Instant createdAt;

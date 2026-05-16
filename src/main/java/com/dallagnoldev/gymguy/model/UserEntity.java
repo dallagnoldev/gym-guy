@@ -70,6 +70,9 @@ public class UserEntity implements Serializable, UserDetails {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RolesEntity> roles = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<ExerciseEntity> exercises;
+
     @CreationTimestamp
     @Column(nullable = false, name = "created_at")
     private Instant createdAt;

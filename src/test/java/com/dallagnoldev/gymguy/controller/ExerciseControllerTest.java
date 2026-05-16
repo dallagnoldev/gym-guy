@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import com.dallagnoldev.gymguy.config.TokenProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,6 +36,12 @@ public class ExerciseControllerTest {
 
     @MockitoBean
     private ExerciseService exerciseService;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     private ExerciseRequestDTO exerciseRequestDTO;
 
@@ -58,7 +66,7 @@ public class ExerciseControllerTest {
                 null
         );
 
-        when(exerciseService.createExercise(any())).thenReturn(response);
+        when(exerciseService.createExercise(any(), isNull())).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/exercises")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +75,30 @@ public class ExerciseControllerTest {
                 .andExpect(jsonPath("$.exerciseId").value(1))
                 .andExpect(jsonPath("$.name").value(exerciseRequestDTO.name()));
 
-        verify(exerciseService, times(1)).createExercise(any());
+        verify(exerciseService, times(1)).createExercise(any(), isNull());
+    }
+
+    @Test
+    public void shouldCreateCustomExerciseSuccessfully() throws Exception {
+        Long userId = 1L;
+        ExerciseResponseDTO response = new ExerciseResponseDTO(
+                1L,
+                exerciseRequestDTO.name(),
+                exerciseRequestDTO.muscularGroup(),
+                null,
+                null
+        );
+
+        when(exerciseService.createExercise(any(), eq(userId))).thenReturn(response);
+
+        mockMvc.perform(post("/api/v1/exercises/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectmapper.writeValueAsString(exerciseRequestDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.exerciseId").value(1))
+                .andExpect(jsonPath("$.name").value(exerciseRequestDTO.name()));
+
+        verify(exerciseService, times(1)).createExercise(any(), eq(userId));
     }
 
     @Test
@@ -180,7 +211,7 @@ public class ExerciseControllerTest {
 
     @Test
     public void shouldReturnConflictWhenExerciseNameAlreadyExists() throws Exception {
-        when(exerciseService.createExercise(any())).thenThrow(new com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException("Exercise name already exists"));
+        when(exerciseService.createExercise(any(), isNull())).thenThrow(new com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException("Exercise name already exists"));
 
         mockMvc.perform(post("/api/v1/exercises")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +220,7 @@ public class ExerciseControllerTest {
                 .andExpect(jsonPath("$.message").value("Exercise name already exists"))
                 .andExpect(jsonPath("$.status").value(409));
 
-        verify(exerciseService, times(1)).createExercise(any());
+        verify(exerciseService, times(1)).createExercise(any(), isNull());
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
+import com.dallagnoldev.gymguy.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ public class ExerciseServiceTest {
     @Mock
     private IExerciseRepository exerciseRepository;
 
+    @Mock
+    private IUserRepository userRepository;
+
     private ExerciseRequestDTO  exerciseRequestDTO;
 
     @BeforeEach
@@ -45,16 +49,33 @@ public class ExerciseServiceTest {
     }
 
     @Test
-    @DisplayName("Should create exercise successfully")
-    public void shouldCreateExerciseSuccessfully() throws ExerciseNameMustBeUniqueException {
+    @DisplayName("Should create default exercise successfully (ADMIN)")
+    public void shouldCreateDefaultExerciseSuccessfully() throws ExerciseNameMustBeUniqueException {
 
         when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
         when(exerciseRepository.save(any(ExerciseEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        ExerciseResponseDTO response = exerciseService.createExercise(exerciseRequestDTO);
+        ExerciseResponseDTO response = exerciseService.createExercise(exerciseRequestDTO, null);
 
         assertNotNull(response);
         verify(exerciseRepository, times(1)).save(any(ExerciseEntity.class));
+        verify(userRepository, never()).getReferenceById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Should create custom exercise successfully (USER)")
+    public void shouldCreateCustomExerciseSuccessfully() throws ExerciseNameMustBeUniqueException {
+        Long userId = 1L;
+
+        when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
+        when(exerciseRepository.save(any(ExerciseEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        ExerciseResponseDTO response = exerciseService.createExercise(exerciseRequestDTO, userId);
+
+        assertNotNull(response);
+        verify(exerciseRepository, times(1)).save(any(ExerciseEntity.class));
+        verify(userRepository, times(1)).getReferenceById(userId);
     }
 
     @Test
@@ -62,7 +83,7 @@ public class ExerciseServiceTest {
     public void shouldThrowExceptionWhenCreatingExerciseWithDuplicateName() {
         when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(true);
 
-        assertThrows(ExerciseNameMustBeUniqueException.class, () -> exerciseService.createExercise(exerciseRequestDTO));
+        assertThrows(ExerciseNameMustBeUniqueException.class, () -> exerciseService.createExercise(exerciseRequestDTO, null));
 
         verify(exerciseRepository, never()).save(any(ExerciseEntity.class));
     }
