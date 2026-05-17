@@ -19,6 +19,7 @@ Build with:
 - **RBAC (Role Based Access Control):** User -> (`ROLE_USER`) and Admin -> (`ROLE_ADMIN`).
 - **Security:** Common users only can see, update or delete their own data.
 - **Workout Management:** Create, Read, Update and Delete your workouts.
+- **Subscription Plans:** FREE, PREMIUM.
 
 ## 📌 API Endpoints
 
