@@ -1,5 +1,6 @@
 package com.dallagnoldev.gymguy.model;
 
+import com.dallagnoldev.gymguy.model.enums.UserPlanTypeEnum;
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import jakarta.persistence.*;
 import lombok.*;
@@ -69,6 +70,10 @@ public class UserEntity implements Serializable, UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RolesEntity> roles = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_type")
+    private UserPlanTypeEnum planType = UserPlanTypeEnum.FREE;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<ExerciseEntity> exercises;

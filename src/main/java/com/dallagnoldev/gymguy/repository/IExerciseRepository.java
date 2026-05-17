@@ -18,4 +18,6 @@ public interface IExerciseRepository extends JpaRepository<ExerciseEntity, Long>
     boolean existsByName(String name);
 
     boolean existsByNameIgnoreCase(String name);
+
+    long countByUserUserId(Long userId);
 }

@@ -1,10 +1,11 @@
 package com.dallagnoldev.gymguy.controller;
 
+import com.dallagnoldev.gymguy.config.TokenProvider;
 import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
-import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.service.WorkoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -38,6 +40,12 @@ public class WorkoutControllerTest {
 
     @MockitoBean
     private WorkoutService workoutService;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     private WorkoutRequestDTO workoutRequestDTO;
     private WorkoutResponseDTO workoutResponseDTO;
@@ -97,7 +105,7 @@ public class WorkoutControllerTest {
 
     @Test
     public void shouldReturnConflictWhenWorkoutLimitReached() throws Exception {
-        when(workoutService.createWorkout(eq(1L), any(WorkoutRequestDTO.class))).thenThrow(new WorkoutQuantityLimitException("Workout quantity limit reached"));
+        when(workoutService.createWorkout(eq(1L), any(WorkoutRequestDTO.class))).thenThrow(new QuantityLimitException("Workout quantity limit reached"));
 
         mockMvc.perform(post("/api/v1/users/{userId}/workouts", 1L)
                 .contentType(MediaType.APPLICATION_JSON)

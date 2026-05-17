@@ -4,7 +4,7 @@ import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
-import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.model.WorkoutEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
@@ -73,7 +73,7 @@ public class WorkoutServiceTest {
 
     @Test
     @DisplayName("Should create workout successfully")
-    public void shouldCreateWorkoutSuccessfully() throws NotFoundException, WorkoutNameMustBeUniqueException, WorkoutQuantityLimitException {
+    public void shouldCreateWorkoutSuccessfully() throws NotFoundException, WorkoutNameMustBeUniqueException, QuantityLimitException {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
         when(workoutRepository.existsByNameIgnoreCase(workoutRequestDTO.name())).thenReturn(false);
@@ -115,7 +115,7 @@ public class WorkoutServiceTest {
         when(workoutRepository.existsByNameIgnoreCase(workoutRequestDTO.name())).thenReturn(false);
         when(workoutRepository.countAllWorkoutsByUserId_UserId(userId)).thenReturn(10L);
 
-        assertThrows(WorkoutQuantityLimitException.class, () -> workoutService.createWorkout(userId, workoutRequestDTO));
+        assertThrows(QuantityLimitException.class, () -> workoutService.createWorkout(userId, workoutRequestDTO));
     }
 
     @Test

@@ -73,8 +73,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
-    @ExceptionHandler(WorkoutQuantityLimitException.class)
-    public ResponseEntity<ErrorResponseDTO> handleWorkoutQuantityLimitException(WorkoutQuantityLimitException ex) {
+    @ExceptionHandler(QuantityLimitException.class)
+    public ResponseEntity<ErrorResponseDTO> handleWorkoutQuantityLimitException(QuantityLimitException ex) {
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .message(ex.getMessage())
                 .status(HttpStatus.CONFLICT.value())

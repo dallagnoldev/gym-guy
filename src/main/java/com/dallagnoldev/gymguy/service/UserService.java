@@ -7,6 +7,7 @@ import com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.PasswordInvalidException;
 import com.dallagnoldev.gymguy.model.UserEntity;
+import com.dallagnoldev.gymguy.model.enums.UserPlanTypeEnum;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import com.dallagnoldev.gymguy.util.PasswordHelper;
 import com.dallagnoldev.gymguy.util.PasswordResponseValidation;
@@ -93,6 +94,16 @@ public class UserService {
     }
 
     @Transactional
+    public void upgradeUserPlan(Long userId) throws NotFoundException {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setPlanType(UserPlanTypeEnum.PREMIUM);
+
+        userRepository.save(user);
+    }
+
+    @Transactional
     public void deleteUser(Long userId) throws NotFoundException {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User not found");
@@ -112,6 +123,7 @@ public class UserService {
                 userEntity.getSex(),
                 userEntity.getHeight(),
                 userEntity.getWeight(),
+                userEntity.getPlanType(),
                 userEntity.getCreatedAt(),
                 userEntity.getUpdatedAt()
         );

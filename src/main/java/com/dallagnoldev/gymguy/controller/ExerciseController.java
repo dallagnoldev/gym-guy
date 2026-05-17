@@ -4,6 +4,7 @@ import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.service.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ExerciseController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ExerciseResponseDTO> create(@RequestBody @Valid ExerciseRequestDTO requestDTO) throws ExerciseNameMustBeUniqueException {
+    public ResponseEntity<ExerciseResponseDTO> create(@RequestBody @Valid ExerciseRequestDTO requestDTO) throws ExerciseNameMustBeUniqueException, NotFoundException, QuantityLimitException {
         ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(requestDTO, null);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -44,7 +45,7 @@ public class ExerciseController {
     @PostMapping("/{userId}")
     public ResponseEntity<ExerciseResponseDTO> createCustomExercise(
             @PathVariable Long userId,
-            @RequestBody @Valid ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException {
+            @RequestBody @Valid ExerciseRequestDTO exerciseRequestDTO) throws ExerciseNameMustBeUniqueException, NotFoundException, QuantityLimitException {
 
         ExerciseResponseDTO exerciseResponseDTO = exerciseService.createExercise(exerciseRequestDTO, userId);
 

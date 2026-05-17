@@ -51,6 +51,14 @@ public class UserController {
         return ResponseEntity.ok(userResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{userId}/upgrade")
+    public ResponseEntity<Void> upgradeUserPlan(@PathVariable Long userId) throws NotFoundException {
+        userService.upgradeUserPlan(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?>  deleteUser(@PathVariable Long userId) throws NotFoundException {

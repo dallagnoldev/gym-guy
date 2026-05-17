@@ -4,7 +4,12 @@ import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
+import com.dallagnoldev.gymguy.model.UserEntity;
+import com.dallagnoldev.gymguy.model.enums.UserPlanTypeEnum;
+import com.dallagnoldev.gymguy.model.strategy.subscription.PlanStrategyFactory;
+import com.dallagnoldev.gymguy.model.strategy.subscription.limits.ISubscriptionLimitStrategy;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +43,12 @@ public class ExerciseServiceTest {
     @Mock
     private IUserRepository userRepository;
 
+    @Mock
+    private PlanStrategyFactory planStrategyFactory;
+
+    @Mock
+    private ISubscriptionLimitStrategy subscriptionLimitStrategy;
+
     private ExerciseRequestDTO  exerciseRequestDTO;
 
     @BeforeEach
@@ -50,7 +61,7 @@ public class ExerciseServiceTest {
 
     @Test
     @DisplayName("Should create default exercise successfully (ADMIN)")
-    public void shouldCreateDefaultExerciseSuccessfully() throws ExerciseNameMustBeUniqueException {
+    public void shouldCreateDefaultExerciseSuccessfully() throws ExerciseNameMustBeUniqueException, QuantityLimitException, NotFoundException {
 
         when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
         when(exerciseRepository.save(any(ExerciseEntity.class)))
@@ -64,10 +75,17 @@ public class ExerciseServiceTest {
 
     @Test
     @DisplayName("Should create custom exercise successfully (USER)")
-    public void shouldCreateCustomExerciseSuccessfully() throws ExerciseNameMustBeUniqueException {
+    public void shouldCreateCustomExerciseSuccessfully() throws ExerciseNameMustBeUniqueException, QuantityLimitException, NotFoundException {
         Long userId = 1L;
+        UserEntity user = UserEntity.builder()
+                .userId(userId)
+                .planType(UserPlanTypeEnum.FREE)
+                .build();
 
         when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(planStrategyFactory.getStrategy(UserPlanTypeEnum.FREE)).thenReturn(subscriptionLimitStrategy);
+        when(subscriptionLimitStrategy.canCreateMoreCustomExercises(anyLong())).thenReturn(true);
         when(exerciseRepository.save(any(ExerciseEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -75,7 +93,39 @@ public class ExerciseServiceTest {
 
         assertNotNull(response);
         verify(exerciseRepository, times(1)).save(any(ExerciseEntity.class));
-        verify(userRepository, times(1)).getReferenceById(userId);
+        verify(userRepository, times(1)).findById(userId);
+        verify(subscriptionLimitStrategy, times(1)).canCreateMoreCustomExercises(anyLong());
+    }
+
+    @Test
+    @DisplayName("Should throw QuantityLimitException when user reaches exercise limit")
+    public void shouldThrowExceptionWhenUserReachesExerciseLimit() {
+        Long userId = 1L;
+        UserEntity user = UserEntity.builder()
+                .userId(userId)
+                .planType(UserPlanTypeEnum.FREE)
+                .build();
+
+        when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(planStrategyFactory.getStrategy(UserPlanTypeEnum.FREE)).thenReturn(subscriptionLimitStrategy);
+        when(subscriptionLimitStrategy.canCreateMoreCustomExercises(anyLong())).thenReturn(false);
+
+        assertThrows(QuantityLimitException.class, () -> exerciseService.createExercise(exerciseRequestDTO, userId));
+
+        verify(exerciseRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw NotFoundException when user id does not exist during exercise creation")
+    public void shouldThrowExceptionWhenUserNotFoundDuringExerciseCreation() {
+        Long userId = 1L;
+        when(exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())).thenReturn(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> exerciseService.createExercise(exerciseRequestDTO, userId));
+
+        verify(exerciseRepository, never()).save(any());
     }
 
     @Test

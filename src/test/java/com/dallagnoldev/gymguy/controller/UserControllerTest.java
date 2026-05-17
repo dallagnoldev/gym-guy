@@ -1,8 +1,10 @@
 package com.dallagnoldev.gymguy.controller;
 
+import com.dallagnoldev.gymguy.config.TokenProvider;
 import com.dallagnoldev.gymguy.dto.UserRequestDTO;
 import com.dallagnoldev.gymguy.dto.UserResponseDTO;
 import com.dallagnoldev.gymguy.dto.update.UserUpdateRequestDTO;
+import com.dallagnoldev.gymguy.model.enums.UserPlanTypeEnum;
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import com.dallagnoldev.gymguy.service.UserService;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,8 +23,7 @@ import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -33,6 +35,12 @@ public class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private UserDetailsService  userDetailsService;
 
     private UserRequestDTO userRequestDTO;
 
@@ -66,6 +74,7 @@ public class UserControllerTest {
                 userRequestDTO.sex(),
                 userRequestDTO.height(),
                 userRequestDTO.weight(),
+                UserPlanTypeEnum.FREE,
                 null,
                 null
         );
@@ -96,6 +105,7 @@ public class UserControllerTest {
                 UserSexEnum.M,
                 1.77,
                 73.0,
+                UserPlanTypeEnum.FREE,
                 null,
                 null
         );
@@ -136,6 +146,7 @@ public class UserControllerTest {
                 userRequestDTO.sex(),
                 userRequestDTO.height(),
                 userRequestDTO.weight(),
+                UserPlanTypeEnum.FREE,
                 null,
                 null
         );
@@ -150,6 +161,28 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Johnny"));
 
         verify(userService, times(1)).updateUser(eq(userId), any(UserUpdateRequestDTO.class));
+    }
+
+    @Test
+    public void shouldUpgradeUserSuccessfully() throws Exception {
+        Long userId = 1L;
+        UserUpdateRequestDTO userUpdateRequestDTO = new UserUpdateRequestDTO(
+                "James",
+                "Bond",
+                "jamesbond007@gmail.com",
+                "40028922",
+                LocalDate.of(2002, 10, 2),
+                UserSexEnum.M,
+                1.77,
+                75.0
+        );
+
+       mockMvc.perform(patch("/api/v1/users/{userId}/upgrade",userId)
+               .content(objectMapper.writeValueAsString(userUpdateRequestDTO)))
+               .andExpect(status().isNoContent());
+
+       verify(userService, times(1)).upgradeUserPlan(userId);
+
     }
 
     @Test

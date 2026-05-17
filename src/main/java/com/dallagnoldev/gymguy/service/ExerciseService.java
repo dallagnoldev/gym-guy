@@ -4,8 +4,11 @@ import com.dallagnoldev.gymguy.dto.ExerciseRequestDTO;
 import com.dallagnoldev.gymguy.dto.ExerciseResponseDTO;
 import com.dallagnoldev.gymguy.exception.ExerciseNameMustBeUniqueException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.model.ExerciseEntity;
 import com.dallagnoldev.gymguy.model.UserEntity;
+import com.dallagnoldev.gymguy.model.strategy.subscription.PlanStrategyFactory;
+import com.dallagnoldev.gymguy.model.strategy.subscription.limits.ISubscriptionLimitStrategy;
 import com.dallagnoldev.gymguy.repository.IExerciseRepository;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +26,10 @@ public class ExerciseService {
 
     private final IExerciseRepository exerciseRepository;
     private final IUserRepository userRepository;
+    private final PlanStrategyFactory factory;
 
     @Transactional
-    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO, Long userId) throws ExerciseNameMustBeUniqueException {
+    public ExerciseResponseDTO createExercise(ExerciseRequestDTO exerciseRequestDTO, Long userId) throws ExerciseNameMustBeUniqueException, QuantityLimitException, NotFoundException {
 
         if (exerciseRepository.existsByNameIgnoreCase(exerciseRequestDTO.name())) {
             throw new ExerciseNameMustBeUniqueException("There is already an exercise with that name");
@@ -34,7 +38,16 @@ public class ExerciseService {
         UserEntity exerciseOwner = null;
 
         if (userId != null) {
-            exerciseOwner = userRepository.getReferenceById(userId);
+            exerciseOwner = userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+
+            ISubscriptionLimitStrategy strategy = factory.getStrategy(exerciseOwner.getPlanType());
+
+            long currentCount = exerciseRepository.countByUserUserId(userId);
+
+            if (!strategy.canCreateMoreCustomExercises(currentCount)) {
+                throw new QuantityLimitException("You have reached the limit of custom exercises creation in your current plan: " + exerciseOwner.getPlanType());
+            }
         }
 
         ExerciseEntity exerciseEntity = ExerciseEntity.builder()

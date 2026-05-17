@@ -4,7 +4,7 @@ import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
-import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.service.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/users/{userId}/workouts")
@@ -32,7 +30,7 @@ public class WorkoutController {
     @PostMapping
     public ResponseEntity<WorkoutResponseDTO> create(
             @PathVariable Long userId,
-            @RequestBody @Valid WorkoutRequestDTO requestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, WorkoutQuantityLimitException {
+            @RequestBody @Valid WorkoutRequestDTO requestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, QuantityLimitException {
 
         WorkoutResponseDTO responseDTO = workoutService.createWorkout(userId, requestDTO);
         URI location = ServletUriComponentsBuilder

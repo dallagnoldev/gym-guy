@@ -7,6 +7,7 @@ import com.dallagnoldev.gymguy.exception.EmailAlreadyExistsException;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.PasswordInvalidException;
 import com.dallagnoldev.gymguy.model.UserEntity;
+import com.dallagnoldev.gymguy.model.enums.UserPlanTypeEnum;
 import com.dallagnoldev.gymguy.model.enums.UserSexEnum;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -215,6 +216,36 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).findById(id);
         verify(userRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("Should upgrade user plan successfully")
+    public void shouldUpgradeUserPlanSuccessfully() throws NotFoundException {
+        Long userId = 1L;
+        UserEntity user = UserEntity.builder()
+                .userId(userId)
+                .planType(UserPlanTypeEnum.FREE)
+                .build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.upgradeUserPlan(userId);
+
+        assertEquals(UserPlanTypeEnum.PREMIUM, user.getPlanType());
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    @DisplayName("Should throw NotFoundException when upgrading plan for non-existent user")
+    public void shouldThrowExceptionWhenUpgradePlanForNonExistentUser() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.upgradeUserPlan(userId));
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, never()).save(any());
     }
 
     @Test

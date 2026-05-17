@@ -4,7 +4,7 @@ import com.dallagnoldev.gymguy.dto.WorkoutRequestDTO;
 import com.dallagnoldev.gymguy.dto.WorkoutResponseDTO;
 import com.dallagnoldev.gymguy.exception.NotFoundException;
 import com.dallagnoldev.gymguy.exception.WorkoutNameMustBeUniqueException;
-import com.dallagnoldev.gymguy.exception.WorkoutQuantityLimitException;
+import com.dallagnoldev.gymguy.exception.QuantityLimitException;
 import com.dallagnoldev.gymguy.model.UserEntity;
 import com.dallagnoldev.gymguy.model.WorkoutEntity;
 import com.dallagnoldev.gymguy.repository.IUserRepository;
@@ -30,7 +30,7 @@ public class WorkoutService {
     private static final int WORKOUT_QUANTITY_LIMIT = 10;
 
     @Transactional
-    public WorkoutResponseDTO createWorkout(Long userId, WorkoutRequestDTO workoutRequestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, WorkoutQuantityLimitException {
+    public WorkoutResponseDTO createWorkout(Long userId, WorkoutRequestDTO workoutRequestDTO) throws NotFoundException, WorkoutNameMustBeUniqueException, QuantityLimitException {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -41,7 +41,7 @@ public class WorkoutService {
         long totalWorkouts = workoutRepository.countAllWorkoutsByUserId_UserId(userId);
 
         if (totalWorkouts >= WORKOUT_QUANTITY_LIMIT) {
-            throw new WorkoutQuantityLimitException("You reached your workout creation limit");
+            throw new QuantityLimitException("You reached your workout creation limit");
         }
 
         WorkoutEntity workoutEntity = WorkoutEntity.builder()
